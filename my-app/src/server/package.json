@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "connect-keycloak": "0.0.16",
     "express": "^4.16.2",
-    "keycloak-js": "^3.4.1-cr.1",
+    "express-session": "^1.15.6",
+    "keycloak-js": "^2.4.0",
     "mongoose": "^4.13.5",
     "request": "^2.83.0"
   }

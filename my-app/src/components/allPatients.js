@@ -3,6 +3,36 @@ import LoadingIndicator from 'react-loading-indicator';
 import {Link} from 'react-router';
 import Pagination from './pagination.js';
 import axios from 'axios';
+var Keycloak = require('keycloak-js');
+
+var auth = {};
+var logout = function() {
+  console.log('*** LOGOUT');
+  auth.loggedIn = false;
+  auth.authz = null;
+  window.location = auth.logoutUrl;
+};
+
+var keycloakAuth = Keycloak({
+  url: 'https://auth.healthforge.io/auth',
+  realm: 'interview',
+  clientId: 'interview',
+});
+auth.loggedIn = false;
+
+keycloakAuth
+  .init({onLoad: 'login-required'})
+  .success(function() {
+    auth.loggedIn = true;
+    auth.authz = keycloakAuth;
+    console.log(keycloakAuth);
+    auth.logoutUrl =
+      'https://auth.healthforge.io/auth/realms/interview/protocol/openid-connect/auth?client_id=interview';
+    //
+  })
+  .error(function() {
+    window.location.reload();
+  });
 
 //Main component with allPatients table. Parent of Pagination and LoadingIndicator
 //components
@@ -19,6 +49,7 @@ class allPatients extends Component {
     this.onSortCriteriaChange = this.onSortCriteriaChange.bind(this);
     this.sortAsc = this.sortAsc.bind(this);
     this.sortDesc = this.sortDesc.bind(this);
+    this.logout = this.logout.bind(this);
 
     //Initial state of the component
     this.state = {
@@ -35,6 +66,13 @@ class allPatients extends Component {
   componentWillMount() {
     this.fetchAllPatients();
   }
+
+  logout = evt => {
+    evt.preventDefault();
+    keycloakAuth.init({onLoad: 'login-required'}).success(function() {
+      keycloakAuth.logout();
+    });
+  };
 
   //Formates birth date
   formatBirthDate = date => {
@@ -255,6 +293,9 @@ class allPatients extends Component {
       return (
         <div className="wrapper">
           <div className="flex-container">
+            <button type="submit" onClick={this.logout}>
+              Log out
+            </button>
             <form onSubmit={this.onSubmitCriteria}>
               <label>
                 Search (last Name, first Name, DOB or zip code)&nbsp;&nbsp;

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import LoadingIndicator from 'react-loading-indicator';
 import {Link} from 'react-router';
 import axios from 'axios';
+import Logout from './logout.js';
 
 //Individal patient table
 class patientById extends Component {
@@ -119,6 +120,7 @@ class patientById extends Component {
     } else {
       return (
         <div>
+          <Logout />
           <div className="flex-container">
             {this.renderPatient(this.state.patientData)}
           </div>

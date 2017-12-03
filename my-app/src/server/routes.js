@@ -1,17 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const request = require('request');
-const size = 1000;
+const size = 100;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-var auth = {};
-var logout = function() {
-  console.log('*** LOGOUT');
-  auth.loggedIn = false;
-  auth.authz = null;
-  window.location = auth.logoutUrl;
-};
 
 //Route for a specific patient
 router.get('/patient/:id', function(req, res) {
