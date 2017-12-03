@@ -1,0 +1,7 @@
+{
+  "realm": "interview",
+  "auth-server-url": "https://auth.healthforge.io/auth",
+  "ssl-required": "external",
+  "resource": "interview",
+  "public-client": true
+}

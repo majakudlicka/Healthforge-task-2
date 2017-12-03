@@ -5,6 +5,14 @@ const size = 1000;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+var auth = {};
+var logout = function() {
+  console.log('*** LOGOUT');
+  auth.loggedIn = false;
+  auth.authz = null;
+  window.location = auth.logoutUrl;
+};
+
 //Route for a specific patient
 router.get('/patient/:id', function(req, res) {
   let url = `https://api.interview.healthforge.io/api${req.url}`;
