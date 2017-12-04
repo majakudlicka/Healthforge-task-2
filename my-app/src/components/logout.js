@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-var Keycloak = require('keycloak-js');
+const Keycloak = require('keycloak-js');
 
 //Logout component
 class Logout extends Component {

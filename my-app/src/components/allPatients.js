@@ -4,6 +4,9 @@ import {Link} from 'react-router';
 import Pagination from './pagination.js';
 import axios from 'axios';
 import Logout from './logout.js';
+const Keycloak = require('keycloak-js');
+const logoutUrl =
+  'https://auth.healthforge.io/auth/realms/interview/protocol/openid-connect/logout?redirect_uri=http://localhost:4444';
 
 // var auth = {};
 // var logout = function() {
@@ -59,12 +62,24 @@ class allPatients extends Component {
       allFilteredPatients: null,
       filteredPatients: null,
       sortCriteria: '',
+      loggedIn: false,
     };
   }
 
   //React lifecycle method
   componentWillMount() {
-    this.fetchAllPatients();
+    var keycloakAuth = Keycloak({
+      url: 'https://auth.healthforge.io/auth',
+      realm: 'interview',
+      clientId: 'interview',
+    });
+    keycloakAuth.init({onLoad: 'login-required'}).success(() => {
+      console.log(keycloakAuth);
+      this.setState({
+        loggedIn: true,
+      });
+      this.fetchAllPatients(keycloakAuth.token);
+    });
   }
 
   // logout = evt => {
@@ -144,9 +159,13 @@ class allPatients extends Component {
   //Grabs all patients from database and saves it into the application state.
   //All subsequent filtering is done on front end, taking advantage of high speed
   //rendering of React components
-  fetchAllPatients = () => {
+  fetchAllPatients = token => {
     axios
-      .get('/patient')
+      .get('/patient', {
+        params: {
+          token: token,
+        },
+      })
       .then(response => {
         this.setState({
           allPatients: response.data.content,
@@ -293,7 +312,6 @@ class allPatients extends Component {
     } else {
       return (
         <div className="wrapper">
-          <Logout />
           <div className="flex-container">
             <form onSubmit={this.onSubmitCriteria}>
               <label>
