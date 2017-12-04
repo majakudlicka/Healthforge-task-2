@@ -52,7 +52,6 @@ router.get('/patient', function(req, res) {
   };
 
   request(options, function(error, response, body) {
-    console.log(error);
     if (error) {
       res.status(500).send('Something went wrong');
     } else {
