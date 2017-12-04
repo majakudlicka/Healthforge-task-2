@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 import LoadingIndicator from 'react-loading-indicator';
 import {Link} from 'react-router';
 import axios from 'axios';
-import Logout from './logout.js';
+const Keycloak = require('keycloak-js');
+const logoutUrl =
+  'https://auth.healthforge.io/auth/realms/interview/protocol/openid-connect/logout?redirect_uri=http://localhost:4444';
 
 //Individal patient table
 class patientById extends Component {
@@ -11,6 +13,7 @@ class patientById extends Component {
     this.formatBirthDate = this.formatBirthDate.bind(this);
     this.renderPatient = this.renderPatient.bind(this);
     this.fetchById = this.fetchById.bind(this);
+    this.logout = this.logout.bind(this);
 
     this.state = {
       patientData: {},
@@ -19,8 +22,24 @@ class patientById extends Component {
 
   //React lifecycle method
   componentWillMount() {
-    this.fetchById(this.props.params.id);
+    const keycloakAuth = Keycloak({
+      url: 'https://auth.healthforge.io/auth',
+      realm: 'interview',
+      clientId: 'interview',
+    });
+    keycloakAuth.init({onLoad: 'login-required'}).success(() => {
+      console.log(keycloakAuth);
+      this.setState({
+        loggedIn: true,
+      });
+      this.fetchById(this.props.params.id, keycloakAuth.token);
+    });
   }
+
+  //Logs out from keyCloak
+  logout = () => {
+    window.location = logoutUrl;
+  };
 
   //Formats birth date
   formatBirthDate = date => {
@@ -32,9 +51,14 @@ class patientById extends Component {
   };
 
   //Fetches patient by Id
-  fetchById = id => {
+  fetchById = (id, token) => {
     axios
-      .get(`/patient/${id}`)
+      .get(`/patient/${id}`, {
+        params: {
+          token: token,
+          id: id,
+        },
+      })
       .then(response => this.setState({patientData: response.data}))
       .catch(err => {
         console.log(err);
@@ -120,16 +144,16 @@ class patientById extends Component {
     } else {
       return (
         <div>
-          <Logout />
           <div className="flex-container">
             {this.renderPatient(this.state.patientData)}
           </div>
-          <div className="flex-container">
-            <Link to="/">
-              <h5>
-                <u>Back to results</u>
-              </h5>
+          <div className="flex-container column">
+            <Link className="logout_link" to="/">
+              Back to results
             </Link>
+            <button type="submit" className="logout_link" onClick={this.logout}>
+              Log out
+            </button>
           </div>
         </div>
       );
