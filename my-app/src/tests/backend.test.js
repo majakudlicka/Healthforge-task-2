@@ -8,10 +8,16 @@ jest.setTimeout(30000);
 
 describe('Test the root path', () => {
   test('It should response with 200 status code', done => {
-    request(app).get('/patient').then(response => {
-      expect(response.statusCode).toBe(200);
-      done();
-    });
+    request(app)
+      .get('/patient', {
+        params: {
+          token: '12345',
+        },
+      })
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
   });
 
   test('Test that cross-origin headers have been applied correctly', done => {

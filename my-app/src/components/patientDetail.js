@@ -20,20 +20,24 @@ class patientById extends Component {
     };
   }
 
-  //React lifecycle method
+  //Connnect to keyCloak and fetches patient data
   componentWillMount() {
     const keycloakAuth = Keycloak({
       url: 'https://auth.healthforge.io/auth',
       realm: 'interview',
       clientId: 'interview',
     });
-    keycloakAuth.init({onLoad: 'login-required'}).success(() => {
-      console.log(keycloakAuth);
-      this.setState({
-        loggedIn: true,
+    keycloakAuth
+      .init({onLoad: 'login-required'})
+      .success(() => {
+        this.setState({
+          loggedIn: true,
+        });
+        this.fetchById(this.props.params.id, keycloakAuth.token);
+      })
+      .error(function() {
+        window.location.reload();
       });
-      this.fetchById(this.props.params.id, keycloakAuth.token);
-    });
   }
 
   //Logs out from keyCloak

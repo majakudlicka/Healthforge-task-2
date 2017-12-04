@@ -3,7 +3,6 @@ import LoadingIndicator from 'react-loading-indicator';
 import {Link} from 'react-router';
 import Pagination from './pagination.js';
 import axios from 'axios';
-import Logout from './logout.js';
 const Keycloak = require('keycloak-js');
 const logoutUrl =
   'https://auth.healthforge.io/auth/realms/interview/protocol/openid-connect/logout?redirect_uri=http://localhost:4444';
@@ -37,22 +36,27 @@ class allPatients extends Component {
     };
   }
 
-  //React lifecycle method
+  //Connnect to keyCloak and fetches patient data
   componentWillMount() {
     const keycloakAuth = Keycloak({
       url: 'https://auth.healthforge.io/auth',
       realm: 'interview',
       clientId: 'interview',
     });
-    keycloakAuth.init({onLoad: 'login-required'}).success(() => {
-      console.log(keycloakAuth);
-      this.setState({
-        loggedIn: true,
+    keycloakAuth
+      .init({onLoad: 'login-required'})
+      .success(() => {
+        this.setState({
+          loggedIn: true,
+        });
+        this.fetchAllPatients(keycloakAuth.token);
+      })
+      .error(function() {
+        window.location.reload();
       });
-      this.fetchAllPatients(keycloakAuth.token);
-    });
   }
 
+  //Logs out from keyCloak
   logout = () => {
     window.location = logoutUrl;
   };

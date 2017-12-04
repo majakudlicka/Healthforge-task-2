@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const request = require('request');
-const size = 100;
+const size = 1000;
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -20,7 +20,6 @@ router.get('/patient/:id', function(req, res) {
   };
 
   request(options, function(error, response, body) {
-    console.log(body);
     if (error) {
       res.status(500).send('Something went wrong');
     } else {
@@ -53,6 +52,7 @@ router.get('/patient', function(req, res) {
   };
 
   request(options, function(error, response, body) {
+    console.log(error);
     if (error) {
       res.status(500).send('Something went wrong');
     } else {
